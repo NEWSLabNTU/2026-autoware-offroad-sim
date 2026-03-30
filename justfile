@@ -2,7 +2,7 @@ set dotenv-load := false
 
 repo_url := "https://github.com/isaac-sim/IsaacSim.git"
 branch := "develop"
-dir := "isaacsim"
+dir := "$HOME/isaacsim"
 
 # List available commands by default
 default:
@@ -11,20 +11,20 @@ default:
 # Install recipe: clone, setup, and build
 @install: clone lfs check-compiler build
 
-# Clone the repository
+# Clone the repository to the home directory
 @clone:
     if [ ! -d "{{dir}}" ]; then \
-        echo "Cloning repository..."; \
-        git clone --recursive --branch={{branch}} {{repo_url}} {{dir}}; \
+        echo "Cloning repository to {{dir}}..."; \
+        git clone --recursive --branch={{branch}} {{repo_url}} "{{dir}}"; \
     else \
         echo "Directory {{dir}} already exists. Skipping clone."; \
     fi
 
 # Initialize and pull Git LFS assets
 @lfs: clone
-    echo "Initializing Git LFS..."
-    cd {{dir}} && git lfs install
-    cd {{dir}} && git lfs pull
+    echo "Initializing Git LFS in {{dir}}..."
+    cd "{{dir}}" && git lfs install
+    cd "{{dir}}" && git lfs pull
 
 # Verify GCC/G++ 11 is being used
 @check-compiler:
@@ -37,7 +37,7 @@ default:
 
 # Build the project
 @build:
-    cd {{dir}} && ./build.sh
+    cd "{{dir}}" && ./build.sh
 
 # Run the simulator with required environment variables
 run:
@@ -45,9 +45,9 @@ run:
     export ROS_DISTRO=humble
     export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/humble/lib
-    cd {{dir}}
+    cd "{{dir}}"
     ./_build/linux-x86_64/release/isaac-sim.sh
 
 # Remove the downloaded repository
 @clean:
-    rm -rf {{dir}}
+    rm -rf "{{dir}}"
